@@ -7,7 +7,7 @@ set -ueo pipefail
 INSTALL_PLUGINS="${INSTALL_PLUGINS:-https://mms.alliedmods.net/mmsdrop/1.10/mmsource-1.10.7-git971-linux.tar.gz
 https://sm.alliedmods.net/smdrop/1.10/sourcemod-1.10.0-git6478-linux.tar.gz
 http://users.alliedmods.net/~kyles/builds/SteamWorks/SteamWorks-git131-linux.tar.gz
-https://github.com/splewis/csgo-practice-mode/releases/download/1.3.3/practicemode_1.3.3.zip
+https://github.com/splewis/csgo-practice-mode/releases/download/1.3.4/practicemode_1.3.4.zip
 }"
 
 get_checksum_from_string () {
