@@ -39,8 +39,7 @@ RUN set -xo pipefail \
         } > ${STEAM_DIR}/autoupdate_script.txt \
       && mkdir ${CSGO_DIR} \
       && chown -R steam:steam ${STEAM_DIR} \
-      && rm -rf /var/lib/apt/lists/* \
-      && [[ -z ${CI+x} ]] && "$STEAMCMD_DIR/steamcmd.sh" +login anonymous +force_install_dir "$CSGO_DIR" +app_update "$CSGO_APP_ID" +quit
+      && rm -rf /var/lib/apt/lists/*
 
 
 ENV LANG=en_US.UTF-8 \
@@ -52,5 +51,5 @@ COPY --chown=steam:steam containerfs ${STEAM_DIR}/
 USER steam
 WORKDIR ${CSGO_DIR}
 VOLUME ${CSGO_DIR}
-ENTRYPOINT ["bash"]
-#ENTRYPOINT exec ${STEAM_DIR}/start.sh
+#ENTRYPOINT ["bash"]
+ENTRYPOINT exec ${STEAM_DIR}/start.sh
