@@ -31,6 +31,8 @@ fi
 # and shutdown the container.
 if [[ $DELETE_ALL -eq 1 ]]; then
     echo -e "\n[*] Deleting data from volumne and exiting"
+    echo -e "\n$ ls -a $CSGO_DIR"
+    ls -a $CSGO_DIR
     rm -r $CSGO_DIR/*
 
     echo -e "\n[*] Finished deleting CSGO data from the volume"
