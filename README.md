@@ -1,3 +1,4 @@
+[![Docker Build and Push](https://github.com/kontax/csgo-prac-docker/actions/workflows/docker-build-and-push.yml/badge.svg)](https://github.com/kontax/csgo-prac-docker/actions/workflows/docker-build-and-push.yml)
 # csgo-training-docker
 
 A CS:GO server with [practicemod](https://github.com/splewis/csgo-practice-mode) within a docker container.

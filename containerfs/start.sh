@@ -27,6 +27,18 @@ if [[ $UPDATE_ONLY -eq 1 ]]; then
     exit 0
 fi
 
+# If the delete envvar is set, then delete everything in the csgo folder
+# and shutdown the container.
+if [[ $DELETE_ALL -eq 1 ]]; then
+    echo -e "\n[*] Deleting data from volumne and exiting"
+    echo -e "\n$ ls -a $CSGO_DIR"
+    ls -a $CSGO_DIR
+    rm -r $CSGO_DIR/*
+
+    echo -e "\n[*] Finished deleting CSGO data from the volume"
+    exit 0
+fi
+
 # set_env_from_file_or_def VAR [DEFAULT]
 # e.g. set_env_from_file_or_def 'RCON_PASSWORD' 'test'
 # Fills $VAR either with the content of the file with the name $VAR_FILE
