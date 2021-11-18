@@ -4,9 +4,9 @@ set -ueo pipefail
 
 : "${CSGO_DIR:?'ERROR: CSGO_DIR IS NOT SET!'}"
 
-INSTALL_PLUGINS="${INSTALL_PLUGINS:-https://mms.alliedmods.net/mmsdrop/1.10/mmsource-1.10.7-git971-linux.tar.gz
-https://sm.alliedmods.net/smdrop/1.10/sourcemod-1.10.0-git6478-linux.tar.gz
-http://users.alliedmods.net/~kyles/builds/SteamWorks/SteamWorks-git131-linux.tar.gz
+INSTALL_PLUGINS="${INSTALL_PLUGINS:-https://mms.alliedmods.net/mmsdrop/1.11/mmsource-1.11.0-git1145-linux.tar.gz
+https://sm.alliedmods.net/smdrop/1.10/sourcemod-1.10.0-git6528-linux.tar.gz
+https://github.com/KyleSanderson/SteamWorks/releases/download/1.2.3c/package-lin.tgz
 https://github.com/splewis/csgo-practice-mode/releases/download/1.3.4/practicemode_1.3.4.zip
 }"
 
@@ -47,7 +47,7 @@ install_plugin() {
   if ! is_plugin_installed "$1"; then
     echo "Downloading $1..."
     case "$filename_ext" in
-      "gz")
+      "gz"|"tgz")
         curl -sSL "$1" | tar -zx -C "$CSGO_DIR/csgo"
         echo "Extracting $filename..."
         create_install_marker "$1"
