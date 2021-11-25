@@ -14,8 +14,8 @@ if [[ $UPDATE_ONLY -eq 1 ]]; then
     echo -e "\n[*] Updating CSGO and exiting"
     [[ -z ${CI+x} ]] && \
     "$STEAMCMD_DIR/steamcmd.sh" \
-        +login anonymous \
         +force_install_dir "$CSGO_DIR" \
+        +login anonymous \
         +app_update "$CSGO_APP_ID" \
         +quit
 
