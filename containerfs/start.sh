@@ -111,6 +111,7 @@ fi
 # Create dynamic server config
 if [ ! -s "$CSGO_DIR/csgo/cfg/server.cfg" ]; then
 cat << SERVERCFG > "$CSGO_DIR/csgo/cfg/server.cfg"
+sv_setsteamaccount "$STEAM_ACCOUNT"
 tv_enable $TV_ENABLE
 tv_delaymapchange 1
 tv_delay 30
