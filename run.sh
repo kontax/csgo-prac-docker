@@ -3,7 +3,7 @@ docker run \
   --interactive \
   --tty \
   --detach \
-  --mount source=csgo-data,target=/home/steam/csgo \
+  --mount source=cs2-data,target=/home/steam/cs2-dedicated \
   --network=host \
   --env "SERVER_HOSTNAME=hostname" \
   --env "SERVER_PASSWORD=password" \

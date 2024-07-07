@@ -3,27 +3,26 @@
 # These envvars should've been set by the Dockerfile
 # If they're not set then something went wrong during the build
 : "${STEAM_DIR:?'ERROR: STEAM_DIR IS NOT SET!'}"
-: "${STEAMCMD_DIR:?'ERROR: STEAMCMD_DIR IS NOT SET!'}"
-: "${CSGO_APP_ID:?'ERROR: CSGO_APP_ID IS NOT SET!'}"
-: "${CSGO_DIR:?'ERROR: CSGO_DIR IS NOT SET!'}"
+: "${STEAMCMDDIR:?'ERROR: STEAMCMDDIR IS NOT SET!'}"
+: "${STEAM_APP_ID:?'ERROR: STEAM_APP_ID IS NOT SET!'}"
 
 
-# If the update envvar is set, then only update the CSGO instance
+# If the update envvar is set, then only update the CS instance
 # and shutdown the container.
 if [[ $UPDATE_ONLY -eq 1 ]]; then
-    echo -e "\n[*] Updating CSGO and exiting"
+    echo -e "\n[*] Updating CS and exiting"
     [[ -z ${CI+x} ]] && \
-    "$STEAMCMD_DIR/steamcmd.sh" \
-        +force_install_dir "$CSGO_DIR" \
+    "$STEAMCMDDIR/steamcmd.sh" \
+        +force_install_dir "$STEAM_DIR" \
         +login anonymous \
-        +app_update "$CSGO_APP_ID" \
+        +app_update "$STEAM_APP_ID" \
         +quit
 
     # Install and configure plugins & extensions
     echo -e "\n[*] Updating or installing plugins"
-    "$BASH" "$STEAM_DIR/manage_plugins.sh"
+    "$BASH" "$HOMEDIR/manage_plugins.sh"
 
-    echo -e "\n[*] Finished updating CSGO"
+    echo -e "\n[*] Finished updating CS"
     exit 0
 fi
 
@@ -31,11 +30,11 @@ fi
 # and shutdown the container.
 if [[ $DELETE_ALL -eq 1 ]]; then
     echo -e "\n[*] Deleting data from volumne and exiting"
-    echo -e "\n$ ls -a $CSGO_DIR"
-    ls -a $CSGO_DIR
-    rm -r $CSGO_DIR/*
+    echo -e "\n$ ls -a $STEAM_DIR"
+    ls -a $STEAM_DIR
+    rm -r $STEAM_DIR/*
 
-    echo -e "\n[*] Finished deleting CSGO data from the volume"
+    echo -e "\n[*] Finished deleting CS data from the volume"
     exit 0
 fi
 
@@ -88,10 +87,10 @@ export NOMASTER="${NOMASTER:-}"
 
 
 # Create dynamic autoexec config
-mkdir -p "$CSGO_DIR/csgo/cfg"
+mkdir -p "$STEAM_DIR/game/csgo/cfg"
 
-if [ ! -s "$CSGO_DIR/csgo/cfg/autoexec.cfg" ]; then
-cat << AUTOEXECCFG > "$CSGO_DIR/csgo/cfg/autoexec.cfg"
+if [ ! -s "$STEAM_DIR/game/csgo/cfg/autoexec.cfg" ]; then
+cat << AUTOEXECCFG > "$STEAM_DIR/game/csgo/cfg/autoexec.cfg"
 log on
 hostname "$SERVER_HOSTNAME"
 rcon_password "$RCON_PASSWORD"
@@ -102,15 +101,15 @@ exec banned_ip.cfg
 AUTOEXECCFG
 
 else
-sed -i "s/^hostname.*/hostname \"$SERVER_HOSTNAME\"/" $CSGO_DIR/csgo/cfg/autoexec.cfg
-sed -i "s/^rcon_password.*/rcon_password \"$RCON_PASSWORD\"/" $CSGO_DIR/csgo/cfg/autoexec.cfg
-sed -i "s/^sv_password.*/sv_password \"$SERVER_PASSWORD\"/" $CSGO_DIR/csgo/cfg/autoexec.cfg
+sed -i "s/^hostname.*/hostname \"$SERVER_HOSTNAME\"/" $STEAM_DIR/game/csgo/cfg/autoexec.cfg
+sed -i "s/^rcon_password.*/rcon_password \"$RCON_PASSWORD\"/" $STEAM_DIR/game/csgo/cfg/autoexec.cfg
+sed -i "s/^sv_password.*/sv_password \"$SERVER_PASSWORD\"/" $STEAM_DIR/game/csgo/cfg/autoexec.cfg
 
 fi
 
 # Create dynamic server config
-if [ ! -s "$CSGO_DIR/csgo/cfg/server.cfg" ]; then
-cat << SERVERCFG > "$CSGO_DIR/csgo/cfg/server.cfg"
+if [ ! -s "$STEAM_DIR/game/csgo/cfg/server.cfg" ]; then
+cat << SERVERCFG > "$STEAM_DIR/game/csgo/cfg/server.cfg"
 sv_setsteamaccount "$STEAM_ACCOUNT"
 tv_enable $TV_ENABLE
 tv_delaymapchange 1
@@ -132,19 +131,18 @@ sv_minupdaterate $TICKRATE
 SERVERCFG
 
 else
-sed -i "s/^tv_enable.*/tv_enable $TV_ENABLE/" $CSGO_DIR/csgo/cfg/server.cfg
+sed -i "s/^tv_enable.*/tv_enable $TV_ENABLE/" $STEAM_DIR/game/csgo/cfg/server.cfg
 
 fi
 
 SRCDS_ARGUMENTS=(
+  "-dedicated"
   "-console"
   "-usercon"
-  "-game csgo"
   "-autoupdate"
   "-authkey $AUTHKEY"
-  "-steam_dir $STEAMCMD_DIR"
-  "-steamcmd_script $STEAM_DIR/autoupdate_script.txt"
-  "-tickrate $TICKRATE"
+  "-steam_dir $STEAMCMDDIR"
+  "-steamcmd_script $HOMEDIR/autoupdate_script.txt"
   "-port $PORT"
   "-net_port_try 1"
   "-ip $IP"
@@ -175,7 +173,7 @@ if [[ $NOMASTER == 1 ]]; then
   SRCDS_ARGUMENTS+=("-nomaster")
 fi
 
-SRCDS_RUN="$CSGO_DIR/srcds_run"
+SRCDS_RUN="$STEAM_DIR/game/bin/linuxsteamrt64/cs2"
 
 # Patch srcds_run to fix autoupdates
 if grep -q 'steam.sh' "$SRCDS_RUN"; then
@@ -184,4 +182,4 @@ if grep -q 'steam.sh' "$SRCDS_RUN"; then
 fi
 
 # Start the server
-exec "$BASH" "$SRCDS_RUN" "${SRCDS_ARGUMENTS[@]}"
+eval "$SRCDS_RUN" "${SRCDS_ARGUMENTS[@]}"

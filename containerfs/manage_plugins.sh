@@ -2,11 +2,9 @@
 
 set -ueo pipefail
 
-: "${CSGO_DIR:?'ERROR: CSGO_DIR IS NOT SET!'}"
+: "${STEAM_DIR:?'ERROR: STEAM_DIR IS NOT SET!'}"
 
-INSTALL_PLUGINS="${INSTALL_PLUGINS:-https://mms.alliedmods.net/mmsdrop/1.11/mmsource-1.11.0-git1145-linux.tar.gz
-https://sm.alliedmods.net/smdrop/1.10/sourcemod-1.10.0-git6528-linux.tar.gz
-https://github.com/KyleSanderson/SteamWorks/releases/download/1.2.3c/package-lin.tgz
+INSTALL_PLUGINS="${INSTALL_PLUGINS:-https://mms.alliedmods.net/mmsdrop/2.0/mmsource-2.0.0-git1293-linux.tar.gz
 https://github.com/splewis/csgo-practice-mode/releases/download/1.3.4/practicemode_1.3.4.zip
 }"
 
@@ -19,7 +17,7 @@ get_checksum_from_string () {
 is_plugin_installed() {
   local url_hash
   url_hash=$(get_checksum_from_string "$1")
-  if [[ -f "$CSGO_DIR/csgo/${url_hash}.marker" ]]; then
+  if [[ -f "$STEAM_DIR/csgo/${url_hash}.marker" ]]; then
     return 0
   else
     return 1
@@ -27,7 +25,7 @@ is_plugin_installed() {
 }
 
 create_install_marker() {
-  echo "$1" > "$CSGO_DIR/csgo/$(get_checksum_from_string "$1").marker"
+  echo "$1" > "$STEAM_DIR/csgo/$(get_checksum_from_string "$1").marker"
 }
 
 file_url_exists() {
@@ -48,19 +46,19 @@ install_plugin() {
     echo "Downloading $1..."
     case "$filename_ext" in
       "gz"|"tgz")
-        curl -sSL "$1" | tar -zx -C "$CSGO_DIR/csgo"
+        curl -sSL "$1" | tar -zx -C "$STEAM_DIR/csgo"
         echo "Extracting $filename..."
         create_install_marker "$1"
         ;;
       "zip")
         curl -sSL -o "$filename" "$1"
         echo "Extracting $filename..."
-        unzip -oq "$filename" -d "$CSGO_DIR/csgo"
+        unzip -oq "$filename" -d "$STEAM_DIR/csgo"
         rm "$filename"
         create_install_marker "$1"
         ;;
       "smx")
-        (cd "$CSGO_DIR/csgo/addons/sourcemod/plugins/" && curl -sSLO "$1")
+        (cd "$STEAM_DIR/csgo/addons/sourcemod/plugins/" && curl -sSLO "$1")
         create_install_marker "$1"
         ;;
       *)
@@ -74,7 +72,7 @@ install_plugin() {
 
 echo "Installing plugins..."
 
-mkdir -p "$CSGO_DIR/csgo"
+mkdir -p "$STEAM_DIR/csgo"
 IFS=' ' read -ra PLUGIN_URLS <<< "$(echo "$INSTALL_PLUGINS" | tr "\n" " ")"
 for URL in "${PLUGIN_URLS[@]}"; do
   install_plugin "$URL"
@@ -83,11 +81,11 @@ done
 echo "Finished installing plugins."
 
 # Add steam ids to sourcemod admin file
-mkdir -p "$CSGO_DIR/csgo/addons/sourcemod/configs"
+mkdir -p "$STEAM_DIR/csgo/addons/sourcemod/configs"
 IFS=',' read -ra STEAMIDS <<< "$SOURCEMOD_ADMINS"
 for id in "${STEAMIDS[@]}"; do
-    echo "\"$id\" \"99:z\"" >> "$CSGO_DIR/csgo/addons/sourcemod/configs/admins_simple.ini"
+    echo "\"$id\" \"99:z\"" >> "$STEAM_DIR/csgo/addons/sourcemod/configs/admins_simple.ini"
 done
 
-PLUGINS_ENABLED_DIR="$CSGO_DIR/csgo/addons/sourcemod/plugins"
-PLUGINS_DISABLED_DIR="$CSGO_DIR/csgo/addons/sourcemod/plugins/disabled"
+PLUGINS_ENABLED_DIR="$STEAM_DIR/csgo/addons/sourcemod/plugins"
+PLUGINS_DISABLED_DIR="$STEAM_DIR/csgo/addons/sourcemod/plugins/disabled"
